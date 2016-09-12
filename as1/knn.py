@@ -38,24 +38,27 @@ def find_nearest_knn(training_data, test_item, k):
     
     return id_label_distance[0:k], predict_label==test_label
 
+def run_knn(data, test_data):
+    k_set = {1:[],3:[],5:[],7:[]}
+    
+    for test_item in test_data:    
+        k_set[1].append(find_nearest_knn(data, test_item, 1)[1])
+        k_set[3].append(find_nearest_knn(data, test_item, 3)[1])
+        k_set[5].append(find_nearest_knn(data, test_item, 5)[1])
+        k_set[7].append(find_nearest_knn(data, test_item, 7)[1])
+    
+    print "1",np.average(k_set[1])
+    print "3",np.average(k_set[3])
+    print "5",np.average(k_set[5])
+    print "7",np.average(k_set[7])
 
-
-
-data = np.genfromtxt("train.txt",delimiter=",",usecols=range(0 , 11))
+tr_data = np.genfromtxt("train.txt",delimiter=",",usecols=range(0 , 11))
 test_data = np.genfromtxt("test.txt",delimiter=",",usecols=range(0 , 11))
 
-k_set = {1:[],3:[],5:[],7:[]}
-
-for test_item in test_data:    
-    k_set[1].append(find_nearest_knn(data, test_item, 1)[1])
-    k_set[3].append(find_nearest_knn(data, test_item, 3)[1])
-    k_set[5].append(find_nearest_knn(data, test_item, 5)[1])
-    k_set[7].append(find_nearest_knn(data, test_item, 7)[1])
-
-print np.average(k_set[1])
-print np.average(k_set[3])
-print np.average(k_set[5])
-print np.average(k_set[7])
+print "Test - "
+run_knn(tr_data, test_data)
+print "Training - "
+run_knn(tr_data, tr_data)
 
 
 
