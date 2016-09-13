@@ -33,7 +33,7 @@ import scipy.stats
 import operator
 from math import log10
 
-def classify(data_file, label_to_mean, label_to_std, labels, label_to_prior):
+def classify(data_file, label_to_mean, label_to_std, label_to_pdf_to_feature, labels, label_to_prior):
     test_data = np.genfromtxt(data_file,delimiter=",",usecols=range(1 , 10))
     test_labels = np.genfromtxt(data_file,delimiter=",",usecols=range(10 , 11))
     
@@ -50,7 +50,7 @@ def classify(data_file, label_to_mean, label_to_std, labels, label_to_prior):
                         label_prob[label] = -999
                     # else ignore this feature while classifying
                 else:
-                    label_prob[label] = label_prob[label] + log10(scipy.stats.norm(mean, std).pdf(feature))
+                    label_prob[label] = label_prob[label] + log10(label_to_pdf_to_feature[label][i].pdf(feature))
             ## add prior probability of label
             label_prob[label] = label_prob[label]  + log10(label_to_prior[label])
             
@@ -58,7 +58,7 @@ def classify(data_file, label_to_mean, label_to_std, labels, label_to_prior):
             accuracy.append(1)
         else:
             accuracy.append(0)
-#         print label_prob
+        print label_prob
 #         print correct_label, max(label_prob.iteritems(), key=operator.itemgetter(1))[0]
     print np.mean(accuracy)
 
@@ -69,6 +69,7 @@ label_to_features = {}
 label_to_std = {}
 label_to_mean = {}
 label_to_prior = {}
+label_to_pdf_to_feature = {}
 
 for label,features in zip(labels,data):
     if (label not in label_to_features):
@@ -79,11 +80,16 @@ for label,features in zip(labels,data):
 for label in label_to_features:
     label_to_mean[label] = np.mean(label_to_features[label], axis=0)
     label_to_std[label] = np.std(label_to_features[label], axis=0)
+    # 9 features
+    label_to_pdf_to_feature[label] = range(0 , 9)
+    for i in range(0 , 9):
+        label_to_pdf_to_feature[label][i] = scipy.stats.norm(label_to_mean[label][i], label_to_std[label][i])
+        
     label_to_prior[label] = ( len(label_to_features[label]) * 1.0 ) / len(labels)
 
 print "Test - "
-classify("test.txt", label_to_mean, label_to_std, labels, label_to_prior)
+classify("test.txt", label_to_mean, label_to_std, label_to_pdf_to_feature, labels, label_to_prior)
 
 print "Training - "
-classify("train.txt", label_to_mean, label_to_std, labels, label_to_prior)
+classify("train.txt", label_to_mean, label_to_std, label_to_pdf_to_feature, labels, label_to_prior)
 
