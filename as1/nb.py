@@ -58,7 +58,7 @@ def classify(data_file, label_to_mean, label_to_std, label_to_pdf_to_feature, la
             accuracy.append(1)
         else:
             accuracy.append(0)
-        print label_prob
+#         print label_prob
 #         print correct_label, max(label_prob.iteritems(), key=operator.itemgetter(1))[0]
     print np.mean(accuracy)
 
@@ -87,6 +87,7 @@ for label in label_to_features:
         
     label_to_prior[label] = ( len(label_to_features[label]) * 1.0 ) / len(labels)
 
+print "Naive Bayes"
 print "Test - "
 classify("test.txt", label_to_mean, label_to_std, label_to_pdf_to_feature, labels, label_to_prior)
 
