@@ -41,17 +41,45 @@ def calcl_MSE(data, label, weights):
     
     return squared_error
 
-def report_linear_regression(tr_data,test_data,tr_label,test_label):
+def get_weights(tr_data, tr_label):
+    '''
+    Get optimised weights
+    '''
     # add one more column in tr_data for bias
     tr_data = np.insert(tr_data, [0],1, axis=1)
-    # add one more column in test_data for bias
-    test_data = np.insert(test_data, [0],1, axis=1)
     
     weights = calc_weights(tr_data, tr_label)
     
-    print "MSE TEST = " + str(calcl_MSE(test_data, test_label, weights)/len(test_data))
-    print "MSE TRAINING = " + str(calcl_MSE(tr_data, tr_label, weights)/len(tr_data))
+    return weights, tr_data
+
+def calcl_residual(data, label):
+    '''
+    Return y_pred - y_true
+    '''
+    weights,data = get_weights(data, label)
+    residual = []
+    for i,x_i in enumerate(data):
+        label_pred = pred_value(x_i, weights)
+#         print label_pred, label[i]
+        residual.append(label_pred - label[i])
     
+    return np.array(residual)
+    
+def report_linear_regression(tr_data,test_data,tr_label,test_label, console=True):
+    
+    weights, tr_data = get_weights(tr_data, tr_label)
+    
+    # add one more column in test_data for bias
+    test_data = np.insert(test_data, [0],1, axis=1)
+    mse_test = calcl_MSE(test_data, test_label, weights)/len(test_data)
+    mse_train = calcl_MSE(tr_data, tr_label, weights)/len(tr_data) 
+    if console:
+        print "MSE TEST = " + str(mse_test)
+        print "MSE TRAINING = " + str(mse_train)
+    
+    return mse_test, mse_train
+        
+        
 def main_fn():
     print "Linear regression with all normalised features"
 

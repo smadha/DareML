@@ -86,7 +86,7 @@ for lamb in  [x * 0.0001 for x in range(1, 100000,1000)]:
 
 
 best_lambda_error = lamb_to_error.most_common()[-1:][0]
-print "Best lambda", best_lambda_error[0], "MSE- ",best_lambda_error[1]    
+print "\nBest lambda found by cross validation ", best_lambda_error[0], "MSE CV - ",best_lambda_error[1]    
 
 weights = calc_weights(tr_data, tr_label, best_lambda_error[0])
 print "Using this lambda = " + str(best_lambda_error[0]) + " MSE TEST = " + str(calcl_MSE(test_data, test_label, weights)/len(test_data))
