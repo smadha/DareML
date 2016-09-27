@@ -91,3 +91,9 @@ ENV/
 .pydevproject
 
 .project
+
+*.pdf
+
+*.txt
+
+*.png
