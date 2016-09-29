@@ -5,11 +5,11 @@ RM    0.690923335    0.69    5
 PTRATIO    -0.5052707569    0.51    10
 INDUS    -0.4830674218    0.48    2
 '''
+
 import numpy as np
-from data_analysis import get_norm_data, boston, calc_pearson
+from data_analysis import get_norm_data, boston, calc_pearson, norm
 from linear_regression import report_linear_regression, calcl_residual
 from itertools import permutations
-from collections import Counter
 
 def report_feature_selection(_tr_data,_test_data,_tr_label,_test_label, _best_4):
     print "Selected 4 features- ", boston.feature_names[_best_4] 
@@ -18,23 +18,6 @@ def report_feature_selection(_tr_data,_test_data,_tr_label,_test_label, _best_4)
     report_linear_regression(_tr_data,_test_data,_tr_label,_test_label)
     print ""
 
-def calc_MI(X,Y,bins):
-    c_XY = np.histogram2d(X,Y,bins)[0]
-    c_X = np.histogram(X,bins)[0]
-    c_Y = np.histogram(Y,bins)[0]
-    
-    H_X = shan_entropy(c_X)
-    H_Y = shan_entropy(c_Y)
-    H_XY = shan_entropy(c_XY)
-    
-    MI = H_X + H_Y - H_XY
-    return MI
-
-def shan_entropy(c):
-    c_normalized = c / float(np.sum(c))
-    c_normalized = c_normalized[np.nonzero(c_normalized)]
-    H = -sum(c_normalized* np.log2(c_normalized))  
-    return H
 
 
 tr_data,test_data,tr_label,test_label = get_norm_data()
@@ -63,16 +46,28 @@ for unused in range(0,3):
 print "Selection with iterative residual corelation"
 report_feature_selection(tr_data[:,best_4 ],test_data[:,best_4 ],tr_label,test_label, best_4)
 
+# Polynomial feature
+print "Calculating polynomial features"
+num_of_new_features =  ( len(tr_data[0]) * (len(tr_data[0]) + 1)/2 )  + len(tr_data[0])
+poly_tr_data, poly_test_data = np.zeros((len(tr_data), num_of_new_features)) , np.zeros((len(test_data), num_of_new_features) )
 
-#Selection by mutual information
-best_m_i = Counter({})
+# copying old features 
+for i in range( 0 , len(tr_data[0]) ):
+    poly_tr_data[:,i] = tr_data[:,i] 
+    poly_test_data[:,i] = test_data[:,i] 
+
+new_col_idx = len(tr_data[0])
 for i in range(0,len(tr_data[0])):
-    m_i = calc_MI(tr_data[:,i ], tr_label, 10)
-    best_m_i[i] = m_i    
+    for j in range(i,len(tr_data[0])):
+        poly_tr_data[:,new_col_idx] = tr_data[:,i] * tr_data[:,j]
+        poly_test_data[:,new_col_idx] = test_data[:,i] * test_data[:,j]
+        
+        new_col_idx += 1
 
-print "Highest mutual information", [(boston.feature_names[i[0]],i[1]) for i in best_m_i.most_common(4)]
-best_4 = [i[0] for i in best_m_i.most_common(4)]
-report_feature_selection(tr_data[:,best_4 ],test_data[:,best_4 ],tr_label,test_label, best_4)
+poly_tr_data, poly_test_data = norm(poly_tr_data, poly_test_data)    
+
+report_linear_regression(poly_tr_data, poly_test_data, tr_label, test_label)
+print ""
 
 # Brute force
 print "Selection with brute force"
@@ -86,5 +81,10 @@ for best_4 in permutations(range(13), 4):
 
 best_4 = list(min_MSE[0])
 report_feature_selection(tr_data[:,best_4 ],test_data[:,best_4 ],tr_label,test_label, best_4)
+
+
+
+
+
 
 

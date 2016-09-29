@@ -4,6 +4,7 @@ Uses data from data_analysis and runs linear regression on it converging through
 import numpy as np
 from data_analysis import get_norm_data
 from collections import Counter
+import itertools
 
 def calc_squared_error(y_pred,y_true):
     '''
@@ -33,7 +34,7 @@ def calc_weights(X, Y, lamb):
     
     return np.dot(X_t_X_inv_X_t, Y)   
 
-def calcl_MSE(data, label, weights):
+def calcl_SE(data, label, weights):
     squared_error = 0
     for i,x_i in enumerate(data):
         label_pred = pred_value(x_i, weights)
@@ -63,31 +64,43 @@ test_data = np.insert(test_data, [0],1, axis=1)
 for lamb in [0.01, 0.1, 1.0]:
     weights = calc_weights(tr_data, tr_label, lamb)
 
-    print "Ridge lambda = " + str(lamb) + " MSE TEST = " + str(calcl_MSE(test_data, test_label, weights)/len(test_data))
-    print "Ridge lambda = " + str(lamb) + " MSE TRAINING = " + str(calcl_MSE(tr_data, tr_label, weights)/len(tr_data))
+    print "Ridge lambda = " + str(lamb) + " MSE TEST = " + str(calcl_SE(test_data, test_label, weights)/len(test_data))
+    print "Ridge lambda = " + str(lamb) + " MSE TRAINING = " + str(calcl_SE(tr_data, tr_label, weights)/len(tr_data))
 
 # Use CV to find best lambda  [0.0001, 10]
 lamb_to_error = Counter({})
-size_tr_fold = int(0.9 * len(tr_data) )
+
+# split it into 10 folds
+fold_size = int(len(tr_data)/10)
+folds = np.split(tr_data,[(i+1)*x for i,x in enumerate([fold_size]*9) ])
 
 for lamb in  [x * 0.0001 for x in range(1, 100000,1000)]:
-    # shuffle entire training data set
-    tr_data,tr_label = shuffle_in_unison_inplace(tr_data,tr_label)
     
-    tr_fold, ev_fold = tr_data[:size_tr_fold,:], tr_data[size_tr_fold:,:]
-    tr_fold_label, ev_fold_label = tr_label[:size_tr_fold], tr_label[size_tr_fold:]
+    mse_ev = 0
     
-    # Train on 9 fold
-    weights = calc_weights(tr_data, tr_label, lamb)
+    for i in range(0,len(folds) ):
+        tr_idx = [1]*len(folds)
+        tr_idx[i] = 0
+        
+        ev_idx = [0]*len(folds)
+        ev_idx[i] = 1
+
+        tr_fold, ev_fold = np.array(list(itertools.compress(tr_data, tr_idx))), np.array(list(itertools.compress(tr_data, ev_idx)))
+        tr_fold_label, ev_fold_label = np.array(list(itertools.compress(tr_label, tr_idx))), np.array(list(itertools.compress(tr_label, ev_idx)))
+         
+        # Train on 9 fold
+        weights = calc_weights(tr_fold, tr_fold_label, lamb)
+        
+        # Test on 1 fold
+        mse_ev += calcl_SE(ev_fold, ev_fold_label, weights)/len(ev_fold)
     
-    # Test on 1 fold
-    lamb_to_error[lamb] = calcl_MSE(tr_data, tr_label, weights)/len(tr_data)
+    lamb_to_error[lamb] = mse_ev / len(folds)
 
 
 
 best_lambda_error = lamb_to_error.most_common()[-1:][0]
-print "\nBest lambda found by cross validation ", best_lambda_error[0], "MSE CV - ",best_lambda_error[1]    
+print "\nBest lambda found by cross validation= ", best_lambda_error[0], "MSE for CV = ",best_lambda_error[1]    
 
 weights = calc_weights(tr_data, tr_label, best_lambda_error[0])
-print "Using this lambda = " + str(best_lambda_error[0]) + " MSE TEST = " + str(calcl_MSE(test_data, test_label, weights)/len(test_data))
+print "Using this lambda = " + str(best_lambda_error[0]) + " MSE TEST = " + str(calcl_SE(test_data, test_label, weights)/len(test_data))
 

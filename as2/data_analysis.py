@@ -106,8 +106,10 @@ def main_fn():
     for i in range(0, len(boston.data[0])):
         plot_histogram(tr_data[:,i], boston.feature_names[i])
 
-    print "Saved all histograms. Name of file is name of feature"
+    print "Saved all histograms as image files. Name of file is name of feature"
+    
     # print pearsonr correlation of all variable
+    print "Pearson correlation of all variables-"
     for i in range(0, len(boston.data[0])):
         print boston.feature_names[i], calc_pearson(tr_data[:,i], tr_label)
     
