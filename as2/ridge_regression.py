@@ -5,6 +5,8 @@ import numpy as np
 from data_analysis import get_norm_data
 from collections import Counter
 import itertools
+import matplotlib.pyplot as plt
+from operator import itemgetter
 
 def calc_squared_error(y_pred,y_true):
     '''
@@ -29,7 +31,7 @@ def calc_weights(X, Y, lamb):
     '''
     lambda_iden = np.identity(len(X[0])) * lamb
     X_t = np.transpose(X)
-    X_t_X_inv = np.linalg.inv( np.dot(X_t,X) + lambda_iden ) 
+    X_t_X_inv = np.linalg.pinv( np.dot(X_t,X) + lambda_iden ) 
     X_t_X_inv_X_t = np.dot(X_t_X_inv, X_t)
     
     return np.dot(X_t_X_inv_X_t, Y)   
@@ -72,22 +74,30 @@ lamb_to_error = Counter({})
 
 # split it into 10 folds
 fold_size = int(len(tr_data)/10)
-folds = np.split(tr_data,[(i+1)*x for i,x in enumerate([fold_size]*9) ])
+remainder_array = [1,2,3,3,3,3,3,3,3]
+
+folds = np.split(tr_data,[(i+1)*x + (remainder_array[i]) for i,x in enumerate([fold_size]*9) ])
+
+split_idx = [0] + [(i+1)*x + (remainder_array[i]) for i,x in enumerate([fold_size]*9) ] + [len(tr_data)]
 
 for lamb in  [x * 0.0001 for x in range(1, 100000,1000)]:
     
     mse_ev = 0
-    
+#     tr_data,tr_label = shuffle_in_unison_inplace(tr_data,tr_label)
     for i in range(0,len(folds) ):
-        tr_idx = [1]*len(folds)
-        tr_idx[i] = 0
+
+        tr_idx = [1]*len(tr_data)
+        for sel in range(split_idx[i],split_idx[i+1]):
+            tr_idx[sel] = 0
         
-        ev_idx = [0]*len(folds)
-        ev_idx[i] = 1
+        ev_idx = [0]*len(tr_data)
+        for sel in range(split_idx[i],split_idx[i+1]):
+            ev_idx[sel] = 1
 
         tr_fold, ev_fold = np.array(list(itertools.compress(tr_data, tr_idx))), np.array(list(itertools.compress(tr_data, ev_idx)))
         tr_fold_label, ev_fold_label = np.array(list(itertools.compress(tr_label, tr_idx))), np.array(list(itertools.compress(tr_label, ev_idx)))
-         
+        
+        
         # Train on 9 fold
         weights = calc_weights(tr_fold, tr_fold_label, lamb)
         
@@ -97,10 +107,16 @@ for lamb in  [x * 0.0001 for x in range(1, 100000,1000)]:
     lamb_to_error[lamb] = mse_ev / len(folds)
 
 
-
 best_lambda_error = lamb_to_error.most_common()[-1:][0]
 print "\nBest lambda found by cross validation= ", best_lambda_error[0], "MSE for CV = ",best_lambda_error[1]    
 
 weights = calc_weights(tr_data, tr_label, best_lambda_error[0])
 print "Using this lambda = " + str(best_lambda_error[0]) + " MSE TEST = " + str(calcl_SE(test_data, test_label, weights)/len(test_data))
 
+x,y=[],[]
+for val in sorted(lamb_to_error.items(), key=itemgetter(0)):
+    x.append(val[0])
+    y.append(val[1])
+    
+plt.plot(x,y)
+plt.savefig("Ridge_CV_RESULTS.png")

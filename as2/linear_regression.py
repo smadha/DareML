@@ -27,7 +27,7 @@ def calc_weights(X, Y):
     '''
 
     X_t = np.transpose(X)
-    X_t_X_inv = np.linalg.inv( np.dot(X_t,X))
+    X_t_X_inv = np.linalg.pinv( np.dot(X_t,X))
     X_t_X_inv_X_t = np.dot(X_t_X_inv, X_t)
     
     return np.dot(X_t_X_inv_X_t, Y)   
