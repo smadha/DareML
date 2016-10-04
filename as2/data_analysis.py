@@ -115,7 +115,7 @@ def main_fn():
     
     tr_data,test_data,tr_label,test_label = get_norm_data()
     print "Normalized Test data example - ", test_data[0],"Label - ", test_label[0]
-    print len(tr_data),len(test_data),len(tr_label),len(test_label) 
+#     print len(tr_data),len(test_data),len(tr_label),len(test_label) 
 
 
     

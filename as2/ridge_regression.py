@@ -80,10 +80,11 @@ folds = np.split(tr_data,[(i+1)*x + (remainder_array[i]) for i,x in enumerate([f
 
 split_idx = [0] + [(i+1)*x + (remainder_array[i]) for i,x in enumerate([fold_size]*9) ] + [len(tr_data)]
 
+tr_data,tr_label = shuffle_in_unison_inplace(tr_data,tr_label)
 for lamb in  [x * 0.0001 for x in range(1, 100000,1000)]:
     
     mse_ev = 0
-#     tr_data,tr_label = shuffle_in_unison_inplace(tr_data,tr_label)
+
     for i in range(0,len(folds) ):
 
         tr_idx = [1]*len(tr_data)

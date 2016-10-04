@@ -46,6 +46,19 @@ for unused in range(0,3):
 print "Selection with iterative residual corelation"
 report_feature_selection(tr_data[:,best_4 ],test_data[:,best_4 ],tr_label,test_label, best_4)
 
+# Brute force
+print "Selection with brute force"
+min_MSE = [[1],9999]
+for best_4 in permutations(range(13), 4):
+    mse_test, mse_train = report_linear_regression(tr_data[:,best_4 ],test_data[:,best_4 ],tr_label,test_label,False)
+    
+    if(mse_train < min_MSE[1]):
+        min_MSE[0] = best_4
+        min_MSE[1] = mse_train
+
+best_4 = list(min_MSE[0])
+report_feature_selection(tr_data[:,best_4 ],test_data[:,best_4 ],tr_label,test_label, best_4)
+
 # Polynomial feature
 print "Calculating polynomial features"
 num_of_new_features =  ( len(tr_data[0]) * (len(tr_data[0]) + 1)/2 )  + len(tr_data[0])
@@ -68,19 +81,6 @@ poly_tr_data, poly_test_data = norm(poly_tr_data, poly_test_data)
 
 report_linear_regression(poly_tr_data, poly_test_data, tr_label, test_label)
 print ""
-
-# Brute force
-print "Selection with brute force"
-min_MSE = [[1],9999]
-for best_4 in permutations(range(13), 4):
-    mse_test, mse_train = report_linear_regression(tr_data[:,best_4 ],test_data[:,best_4 ],tr_label,test_label,False)
-    
-    if(mse_train < min_MSE[1]):
-        min_MSE[0] = best_4
-        min_MSE[1] = mse_train
-
-best_4 = list(min_MSE[0])
-report_feature_selection(tr_data[:,best_4 ],test_data[:,best_4 ],tr_label,test_label, best_4)
 
 
 
