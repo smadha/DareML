@@ -91,21 +91,19 @@ def bias_variance_mse_lambda():
     
     # Estimate param and store y_pred, MSE
     lambda_arr = [0.001,0.003,0.01,0.03,0.1,0.3,1.0]
-    h_lambda_y,h_lambda_mse = [np.zeros((100,sample_size))]*len(lambda_arr),[np.zeros(100)]*len(lambda_arr)
-    
+#     h_lambda_y,h_lambda_mse = [np.zeros((100,sample_size))]*len(lambda_arr),[np.zeros(100)]*len(lambda_arr)
+    h_lambda_y,h_lambda_mse = np.zeros((len(lambda_arr),100,sample_size)),np.zeros((len(lambda_arr),100))
+        
     for i in range(len(sample_x)):
         for idx,lambda_i in enumerate(lambda_arr):
             # 2 features for each h
-            h_lambda_mse[idx], h_lambda_y[idx] = report_linear_regression(get_feature(sample_x[i],2), sample_y[i], False,lamb=lambda_i)
+            h_lambda_mse[idx][i], h_lambda_y[idx][i] = report_linear_regression(get_feature(sample_x[i],2), sample_y[i], False,lamb=lambda_i)
         
         
     # plot MSE for each lambda
-#     plot_histogram(g1_mse, "g1_mse" + str(sample_size) )
-#     plot_histogram(g2_mse, "g2_mse" + str(sample_size) )
-#     plot_histogram(g3_mse, "g3_mse" + str(sample_size) )
-#     plot_histogram(g4_mse, "g4_mse" + str(sample_size) )
-#     plot_histogram(g5_mse, "g5_mse" + str(sample_size) )
-#     plot_histogram(g6_mse, "g6_mse" + str(sample_size) )
+    for idx,lambda_i in enumerate(lambda_arr):
+        plot_histogram(h_lambda_mse[idx], "lambda_mse_" + str(lambda_i).replace(".", "_") )
+    
     
     # Calculate bias using y_pred
     # Bias can also be calculated using MSE = average(MSE)
