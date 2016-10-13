@@ -1,31 +1,32 @@
-rbf_acc = [[ -3.,-7.,55.75], [ -3.,-6.,55.75], [ -3.,-5.,55.75], [ -3.,-4.,55.75], [ -3.,-3.,65.4 ], [ -3.,-2.,73.45], [ -3.,-1.,55.75], [ -2.,-7.,55.75], [ -2.,-6.,55.75], [ -2.,-5.,55.75], [ -2.,-4.,83.  ], [ -2.,-3.,91.4 ], [ -2.,-2.,91.4 ], [ -2.,-1.,64.2 ], [ -1.,-7.,55.75], [ -1.,-6.,55.75], [ -1.,-5.,86.3 ], [ -1.,-4.,92.05], [ -1.,-3.,93.25], [ -1.,-2.,95.1 ], [ -1.,-1.,90.75], [  0.,-7.,55.75], [  0.,-6.,86.5 ], [  0.,-5.,91.95], [  0.,-4.,93.5 ], [  0.,-3.,94.7 ], [  0.,-2.,95.3 ], [  0.,-1.,95.8 ], [  1.,-7.,86.55], [  1.,-6.,91.9 ], [  1.,-5.,92.95], [  1.,-4.,93.8 ], [  1.,-3.,95.15], [  1.,-2.,96.3 ], [  1.,-1.,95.3 ], [  2.,-7.,92.2 ], [  2.,-6.,93.5 ], [  2.,-5.,94.2 ], [  2.,-4.,95.05], [  2.,-3.,96.35], [  2.,-2.,96.8 ], [  2.,-1.,95.3 ], [  3.,-7.,93.15], [  3.,-6.,93.85], [  3.,-5.,94.05], [  3.,-4.,95.15], [  3.,-3.,96.5 ], [  3.,-2.,96.15], [  3.,-1.,95.8 ], [  4.,-7.,93.65], [  4.,-6.,94.95], [  4.,-5.,94.8 ], [  4.,-4.,96.2 ], [  4.,-3.,96.65], [  4.,-2.,96.4 ], [  4.,-1.,95.95], [  5.,-7.,94.2 ], [  5.,-6.,94.15], [  5.,-5.,95.  ], [  5.,-4.,96.25], [  5.,-3.,96.25], [  5.,-2.,96.8 ], [  5.,-1.,95.45], [  6.,-7.,94.95], [  6.,-6.,95.3 ], [  6.,-5.,95.9 ], [  6.,-4.,96.5 ], [  6.,-3.,96.  ], [  6.,-2.,96.75], [  6.,-1.,96.15], [  7.,-7.,94.7 ], [  7.,-6.,94.75], [  7.,-5.,96.4 ], [  7.,-4.,95.55], [  7.,-3.,95.85], [  7.,-2.,97.  ], [  7.,-1.,95.55]]
-
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.cm as cm
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
-import matplotlib.pyplot as plt
 import numpy as np
 
-fig = plt.figure()
-ax = fig.gca(projection='3d')
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+import matplotlib.pyplot as plt
 
-rbf_acc=np.array(rbf_acc)
+def save_3d_fig(acc_data, fig_name ):
+    acc_data=np.array(acc_data)
+    max_val = max(acc_data[:,2])
+    print max_val, acc_data[np.where(acc_data[:,2] == max_val)[0][0]]
+    
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    X, Y, Z = acc_data[:,0], acc_data[:,1], acc_data[:,2]
+    X, Y = np.meshgrid(X, Y)
+    
+    surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.coolwarm,
+                           linewidth=0, antialiased=False)
+    # ax.set_zlim(-1.01, 1.01)
+    
+    ax.zaxis.set_major_locator(LinearLocator(10))
+    ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+    
+    fig.colorbar(surf, shrink=0.5, aspect=5)
+    plt.figtext(.02, .02, fig_name)
+    
+    plt.savefig(fig_name)
 
-X, Y, Z = rbf_acc[:,0], rbf_acc[:,1], rbf_acc[:,2]
-X, Y = np.meshgrid(X, Y)
-print X,Y,Z
-surf = ax.plot_surface(X, Y, Z,rstride=1, cstride=1, linewidth=0, antialiased=False)
-
-ax.set_zlim(-1.01, 1.01)
-
-ax.zaxis.set_major_locator(LinearLocator(10))
-ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
-
-m = cm.ScalarMappable(cmap=cm.jet)
-m.set_array(Z)
-plt.colorbar(m)
-
-fig.colorbar(surf, shrink=0.5, aspect=5)
-plt.show()
-
+if __name__ == '__main__':
+    save_3d_fig([[-6, 1, 55.75], [-5, 2, 55.75], [-4, 3, 55.75], [-3, 4, 73.0], [-2, 5, 92.2], [-1, 6, 93.1], [0, 7, 95.45], [1, 8, 95.65], [2, 9, 96.85]], "fig_name")
 
