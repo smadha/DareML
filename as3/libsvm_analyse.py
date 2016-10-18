@@ -2,7 +2,7 @@ from scipy.io import loadmat
 import numpy as np
 from svmutil import *
 import time
-from plot_3d import save_3d_fig
+from plot_3d import *
 ''' 
 0 having_IP_Address  { -1,1 }
 1 URL_Length   { 1,0,-1 }
@@ -66,75 +66,85 @@ def split_multi_val(col, DATA):
     col_values.append(arr__1)
     return col_values
 
-col_fixes = np.array([2, 7, 8, 14, 15, 16, 26, 29])-1
+col_fixes = np.array([2, 7, 8, 14, 15, 26, 29])-1
 col_values_train = []
 col_values_test = []
 
 for col in col_fixes:
     col_values_train +=split_multi_val(col, TRAINING_DATA)
     col_values_test +=split_multi_val(col, TEST_DATA)
-    
-
-
-col_added = range(len(TRAINING_DATA[0]),len(TRAINING_DATA[0])+len(col_values_train))
-
-for idx,i in enumerate(col_added):
-    col = np.transpose(col_values_train[idx])
-    TRAINING_DATA = np.insert(TRAINING_DATA, i, col, axis=1)
-    
-    col = np.transpose(col_values_test[idx])
-    TEST_DATA = np.insert(TEST_DATA, i, col, axis=1)
-    
 
 TRAINING_DATA = np.delete(TRAINING_DATA, col_fixes,axis=1)
 TEST_DATA = np.delete(TEST_DATA, col_fixes,axis=1)
 
-print "data pre-processed"
+col_added = np.array([[i,i+1,i+2] for i in col_fixes]).flatten().tolist() 
+# print col_added, len(col_added) 
+for idx,i in enumerate(col_added):
+    insert_idx = i + ((idx/3)*2)
+#     insert_idx = i  
+    col = np.transpose(col_values_train[idx])
+    TRAINING_DATA = np.insert(TRAINING_DATA, insert_idx, col, axis=1)
+    
+    col = np.transpose(col_values_test[idx])
+    TEST_DATA = np.insert(TEST_DATA, insert_idx, col, axis=1)
+    
 
+TRAINING_DATA = np.clip(TRAINING_DATA,0,1)
+TEST_DATA = np.clip(TEST_DATA,0,1)
+        
 prob = svm_problem(TRAINING_LABEL.tolist()[0], TRAINING_DATA.tolist())
 
-print "Cross validation with libsvm"
-run_time = []
-gen_acc=[]
-poly_acc = []
-rbf_acc = []
-for i in range(-6,3):
-    start = time.time()
-    param = svm_parameter('-c {0} -v 3 -q'.format(4**i))
-    print "for C= 4^{0} -".format(i) 
-    gen_acc.append([i,i+7,svm_train(prob,param)])
+# print "sum row 0",sum(TEST_DATA[0]),"sum row 10", sum(TEST_DATA[10]),"sum row 20", sum(TEST_DATA[20])
+def main_fn():
+    print "data pre-processed" 
+
+    print "Cross validation with libsvm"
+    run_time = []
+    gen_acc=[]
+    poly_acc = []
+    rbf_acc = []
+    for i in range(-6,3):
+        start = time.time()
+        param = svm_parameter('-s 0 -t 0 -c {0} -v 3 -q'.format(4**i))
+        gen_acc.append([i,svm_train(prob,param)])
+    #     svm_train(TRAINING_LABEL.tolist()[0], TRAINING_DATA.tolist(),'-c {0} -v 3 -q'.format(4**i))
+        print "Above for C= 4^{0} time {1:.4f}".format(i,((time.time()-start)/3)) 
+        
+        run_time.append([i,(time.time()-start)/3])
     
-    run_time.append(time.time()-start)
- 
-print "Average Training time normal SVM- ", np.mean(run_time)
-save_3d_fig(gen_acc, "gen_svm")
-
-print "Polynomial kernel"
-run_time = []
-for i in range(-3,8):
-    for d in range(1,4):
-        start = time.time()
-        param = svm_parameter('-c {0} -v 3 -t 1 -d {1} -q'.format(4**i,d))
-        print "for C= 4^{0} degree= {1} :".format(i, d) 
-        poly_acc.append([i,d,svm_train(prob,param)])
-        run_time.append(time.time()-start)
- 
-print "Average Training time Polynomial kernel- ", np.mean(run_time)
-save_3d_fig(poly_acc, "polynomial_kernel")
-
-print "RBF kernel"
-run_time = []
-for i in range(-3,8):
-    for g in range(-7,0):
-        start = time.time()
-        param = svm_parameter('-c {0} -v 3 -t 2 -g {1} -q'.format(4**i,4**g))
-        print "for C= 4^{0} gamma= 4^{1} :".format(i, g) 
-        rbf_acc.append([i,g,svm_train(prob,param)])
-        run_time.append(time.time()-start)
-
-print "Average Training time RBF kernel- ", np.mean(run_time)
-save_3d_fig(rbf_acc, "rbf_kernel")
-
-
-
-
+    save_2d_fig(gen_acc, "SVM_Linear", labels=["C 4^","Accuracy"])
+    save_2d_fig(run_time, "SVM_TIME_Linear", labels=["C 4^","Time"])
+    
+    print "Polynomial kernel"
+    run_time = []
+    for i in range(-3,8):
+        for d in range(1,4):
+            start = time.time()
+            param = svm_parameter('-c {0} -v 3 -t 1 -d {1} -q'.format(4**i,d)) 
+            poly_acc.append([i,d,svm_train(prob,param)])
+            print "Above for C= 4^{0} degree= {1} time={2:.4f}".format(i, d,(time.time()-start)/3 )
+            run_time.append([i,d,(time.time() - start)/3])
+     
+    save_3d_fig(poly_acc, "SVM_polynomial_kernel",labels=["C 4^","Degree 4^","Accuracy"])
+    save_3d_fig(run_time, "SVM_TIME_polynomial_kernel",labels=["C 4^","Degree 4^","Time"])
+    
+    print "RBF kernel"
+    run_time = []
+    for i in range(-3,8):
+        for g in range(-7,0):
+            start = time.time()
+            param = svm_parameter('-c {0} -v 3 -t 2 -g {1} -q'.format(4**i,4**g))
+            rbf_acc.append([i,g,svm_train(prob,param)])
+            print "Above for C= 4^{0} gamma= 4^{1} time={2:.4f}".format(i, g,(time.time()-start)/3 ) 
+            run_time.append([i,g,(time.time() - start)/3])
+    
+    
+    save_3d_fig(rbf_acc, "SVM_rbf_kernel",labels=["C 4^","gamma 4^","Accuracy"])
+    save_3d_fig(run_time, "SVM_TIME_rbf_kernel",labels=["C 4^","gamma 4^","Time"])
+#     save_2d_fig(np.array(run_time)[:,[1,2]], "SVM_TIME_rbf_gamma_kernel",labels=["gamma 4^","Time"])
+    
+    
+if __name__ == '__main__':
+    main_fn()
+    
+    

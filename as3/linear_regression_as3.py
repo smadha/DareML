@@ -24,8 +24,8 @@ def calc_weights(X, Y, lamb=0):
     weights = (X^T X)^-1 * X^T * Y
     return weight
     '''
-
     lambda_iden = np.identity(len(X[0])) * lamb
+    
     X_t = np.transpose(X)
     X_t_X_inv = np.linalg.pinv( np.dot(X_t,X) + lambda_iden ) 
     X_t_X_inv_X_t = np.dot(X_t_X_inv, X_t)
@@ -70,14 +70,24 @@ def calcl_residual(data, label):
     
     return np.array(residual)
     
-def report_linear_regression(tr_data,tr_label, console=True,lamb=0):
+def report_linear_regression(tr_data,tr_label, console=True,lamb=0, test_data=[],test_label=[]):
     
     weights, tr_data = get_weights(tr_data, tr_label,lamb)
     
-    mse_train, all_label_pred = calcl_MSE(tr_data, tr_label, weights) 
+    mse_train, all_label_pred = calcl_MSE(tr_data, tr_label, weights)
+    if test_data == []:
+        test_data = np.ones(( len(test_label) ,1))
+    else:
+        test_data = np.insert(test_data, [0],1, axis=1)
+     
+    if test_label == []:
+        mse_test, test_label_pred = [],[]
+    else: 
+        mse_test, test_label_pred = calcl_MSE(test_data, test_label, weights) 
+    
     if console:
         print "MSE  = " , str(tr_data[0]) , str(mse_train)
     
-    return mse_train, all_label_pred
+    return mse_train, all_label_pred, mse_test, test_label_pred
         
         
