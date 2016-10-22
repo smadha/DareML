@@ -94,6 +94,8 @@ ENV/
 
 *.pdf
 
-*.txt
+#*.txt
 
 *.png
+
+libsvm-3.21/
