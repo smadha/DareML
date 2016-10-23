@@ -149,9 +149,8 @@ def testmodels(X_tr, y_tr, X_te, y_te, archs, actfn='relu', last_act='softmax', 
 					if score[1] > best_acc:
 						best_acc = score[1]
 						best_config = [arch, reg_coeff, sgd_decay, sgd_mom, actfn, best_acc]
-					print('Score for architecture = {0}, lambda = {1}, decay = {2}, ' +	
-						'momentum = {3}, actfn = {4}: {5}'.format(arch, reg_coeff, sgd_decay,
-						sgd_mom, actfn, score[1]))
-	print('Best Config: architecture = {0}, lambda = {1}, decay = {2}, momentum = {3}, ' +
-		'actfn = {4}, best_acc = {5}'.format(best_config[0], best_config[1], best_config[2], 
-		best_config[3], best_config[4], best_config[5]))
+					print('Score for architecture = {0}, lambda = {1}, decay = {2}, momentum = {3}, actfn = {4}: {5}'.format(arch, reg_coeff, sgd_decay, sgd_mom, actfn, score[1]))
+	print('Best Config: architecture = {0}, lambda = {1}, decay = {2}, momentum = {3}, actfn = {4}, best_acc = {5}'.format(best_config[0], best_config[1], best_config[2], best_config[3], best_config[4], best_config[5]))
+
+
+X_tr,y_tr,X_te,y_te = loaddata("MiniBooNE_PID_TEST.txt")

@@ -54,7 +54,7 @@ def classify(data_file, label_to_mean, label_to_std, label_to_pdf_to_feature, la
             ## add prior probability of label
             label_prob[label] = label_prob[label]  + log10(label_to_prior[label])
             
-        if correct_label == max_relation(label_prob.iteritems(), key=operator.itemgetter(1))[0]:
+        if correct_label == max(label_prob.iteritems(), key=operator.itemgetter(1))[0]:
             accuracy.append(1)
         else:
             accuracy.append(0)
