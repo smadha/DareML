@@ -6,7 +6,7 @@ Also explain why this trend is different from that of linear activations. Report
 the time taken to train these architectures with those for linear and sigmoid architectures
 '''
 from hw_utils import testmodels,X_tr,y_tr,X_te,y_te 
-
+print "ReLu activation"
 din, dout = len(X_tr[0]), len(y_tr[0])
 
 arch = [[din, 50, dout],[din, 500, dout], [din, 500, 300, dout], [din, 800, 500, 300, dout], [din, 800, 800, 500, 300, dout]]
