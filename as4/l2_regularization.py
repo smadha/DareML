@@ -17,4 +17,4 @@ testmodels(X_tr, y_tr, X_te, y_te, arch, actfn='relu', last_act='softmax', reg_c
                 num_epoch = 30, batch_size = 1000, sgd_lr = 5e-4, sgd_decays = [0.0], sgd_moms = [0.0],
                     sgd_Nesterov = False, EStop = False, verbose = 0)
 
-print "done"
+print "L2-Regularization ends"
