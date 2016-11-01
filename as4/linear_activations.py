@@ -10,6 +10,7 @@ architectures: [din, 50, dout], [din, 500, dout], [din, 500, 300, dout], [din, 8
 [din, 800, 800, 500, 300, dout]. Report the observations and explain the pattern of test set
 accuracies obtained. Also report the time taken to train these new set of architectures.
 '''
+
 from hw_utils import testmodels,X_tr,y_tr,X_te,y_te 
 import time
 

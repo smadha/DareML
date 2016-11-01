@@ -9,6 +9,10 @@ The submitted file is set up as follows. In the first line is the the number of 
 followed by the number of background events. The signal events come first, followed by the background events. 
 Each line, after the first line has the 50 particle ID variables for one event.
 '''
+import theano
+theano.config.openmp = True
+OMP_NUM_THREADS=10 
+
 import numpy as np
 
 from keras.layers import Input, Dense
@@ -153,5 +157,6 @@ def testmodels(X_tr, y_tr, X_te, y_te, archs, actfn='relu', last_act='softmax', 
 	print('Best Config: architecture = {0}, lambda = {1}, decay = {2}, momentum = {3}, actfn = {4}, best_acc = {5}'.format(best_config[0], best_config[1], best_config[2], best_config[3], best_config[4], best_config[5]))
 
 
-X_tr,y_tr,X_te,y_te = loaddata("MiniBooNE_PID_TEST.txt")
+X_tr,y_tr,X_te,y_te = loaddata("MiniBooNE_PID.txt")
+X_tr, X_te = normalize(X_tr, X_te)
 print "Data loaded - ", X_tr.shape , y_tr.shape 

@@ -1,7 +1,3 @@
-import theano
-theano.config.openmp = True
-OMP_NUM_THREADS=8 
-
 import linear_activations
 import sigmoid_activations
 import relu_activations
