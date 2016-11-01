@@ -11,7 +11,7 @@ Each line, after the first line has the 50 particle ID variables for one event.
 '''
 import theano
 theano.config.openmp = True
-OMP_NUM_THREADS=32
+OMP_NUM_THREADS=20
 
 import numpy as np
 
