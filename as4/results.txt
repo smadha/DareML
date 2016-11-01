@@ -66,9 +66,9 @@ done
 
 
 Combining previous analysis
-Score for architecture = [50, 800, 500, 300, 2], lambda = 5e-07, decay = 5e-05, momentum = 0.9, actfn = relu: 0.814477376172
-Best Config: architecture = [50, 800, 500, 300, 2], lambda = 5e-07, decay = 5e-05, momentum = 0.9, actfn = relu, best_acc = 0.814477376172
-Combining previous analysis ends in 154.894 seconds
+Score for architecture = [50, 800, 500, 300, 2], lambda = 5e-06, decay = 0.0007, momentum = 0.99, actfn = relu: 0.818936685343
+Best Config: architecture = [50, 800, 500, 300, 2], lambda = 5e-06, decay = 0.0007, momentum = 0.99, actfn = relu, best_acc = 0.818936685343
+Combining previous analysis ends in 170.711 seconds
 
 Grid search
 Epoch 00026: early stopping
