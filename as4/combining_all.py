@@ -8,9 +8,9 @@ print "Combining previous analysis"
 din, dout = len(X_tr[0]), len(y_tr[0])
 
 arch = [ [din, 800, 500, 300, dout]]
-l2_reg_coeffs = [5e-07]
-decays = [5e-05]
-moms = [0.90]
+l2_reg_coeffs = [5e-06]
+decays = [7e-4]
+moms = [0.99]
 
 start_time = time.time()
 testmodels(X_tr, y_tr, X_te, y_te, arch, actfn='relu', last_act='softmax', reg_coeffs = l2_reg_coeffs,
