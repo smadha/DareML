@@ -154,3 +154,4 @@ def testmodels(X_tr, y_tr, X_te, y_te, archs, actfn='relu', last_act='softmax', 
 
 
 X_tr,y_tr,X_te,y_te = loaddata("MiniBooNE_PID_TEST.txt")
+print "Data loaded - ", X_tr.shape , y_tr.shape 
