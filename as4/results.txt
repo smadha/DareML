@@ -66,8 +66,8 @@ done
 
 
 Combining previous analysis
-Score for architecture = [50, 800, 500, 300, 2], lambda = 5e-06, decay = 0.0007, momentum = 0.99, actfn = relu: 0.818936685343
-Best Config: architecture = [50, 800, 500, 300, 2], lambda = 5e-06, decay = 0.0007, momentum = 0.99, actfn = relu, best_acc = 0.818936685343
+Score for architecture = [50, 800, 500, 300, 2], lambda = 5e-06, decay = 0.0007, momentum = 0.99, actfn = relu: 0.820589704327
+Best Config: architecture = [50, 800, 500, 300, 2], lambda = 5e-06, decay = 0.0007, momentum = 0.99, actfn = relu, best_acc = 0.820589704327
 Combining previous analysis ends in 170.711 seconds
 
 Grid search
