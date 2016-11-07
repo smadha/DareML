@@ -13,7 +13,7 @@ def plot_scatter(X_color, name, mean_points=[]):
     name = name/path of image
     mean_points = list of points
     '''
-    if mean_points:
+    if mean_points and len(mean_points[0]) == 2:
         mean_points = np.array(mean_points)
         plt.plot(mean_points[:,0], mean_points[:,1],"ro", markersize=10, color='black')
     
