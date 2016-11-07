@@ -7,11 +7,16 @@ and markers. (you need to report 6 plots, 3 for each dataset.)
 import numpy as np
 from input_data_util import blob_data, circle_data, plot_scatter
 
+def linear(x1):
+    return x1
+
+
 color_arr = ["red", "green", "blue", "yellow", "grey"]
-def run_k_means(K, X, data_set_name):
+def run_k_means(K, X, data_set_name, trans = linear):
     '''
     K -> num of clusters
     X -> all data points X[0] = [x_1, x_2]
+    trans -> transformation kernel
     '''
     # Initialize mean randomly
     means = []
@@ -23,7 +28,7 @@ def run_k_means(K, X, data_set_name):
     # dict of cluster to list of points in that cluster
     cluster = dict.fromkeys(range(K))
         
-    while avg_dist_with_prev > 0.1:
+    while avg_dist_with_prev > 0.001:
         #store current mean to be used later
         prev_means = [] + means
         #initialize all clusters with 0 data points
@@ -34,7 +39,7 @@ def run_k_means(K, X, data_set_name):
         for x in X:
             dist_k = []
             for k in range(K):
-                dist_k.append(np.linalg.norm(means[k]-x))
+                dist_k.append(np.linalg.norm(trans(means[k]) - trans(x) ))
             
             nearest_k = np.argmin(dist_k)
             cluster[nearest_k].append(x)
@@ -42,19 +47,23 @@ def run_k_means(K, X, data_set_name):
         dist_with_prev = []
         # find mean of all point in a cluster
         for k in range(K):
-            means[k] = np.mean(cluster[k], axis = 0)
-            dist_with_prev.append(np.linalg.norm(means[k] - prev_means[k]))
+            trans_cluster_k = [trans(x_cluster_k) for x_cluster_k in cluster[k]]
+                
+            means[k] = np.mean(trans_cluster_k, axis = 0)
+            # calculate distance with previous means
+            dist_with_prev.append(np.linalg.norm(  trans(means[k]) -  trans(prev_means[k]) ))
         
+        # average distance with prev
         avg_dist_with_prev = np.average(dist_with_prev)
         
+    print data_set_name, "Cluster :", "\t".join([ "{0} - {1} points".format(cluster_id+1, len(points)) for cluster_id, points in cluster.iteritems()])
     plot_scatter( [(points, color_arr[cluster_id]) for cluster_id, points in cluster.iteritems()], "./kmeans/" + data_set_name + str(K), means )
         
     
 if __name__ == '__main__':
+    print "Running K-Means"
     for k in [2, 3, 5]:
         run_k_means(k, blob_data, "blob_data")
-        run_k_means(k, circle_data, "circle_data")
-    
-    
+        run_k_means(k, circle_data, "circle_data") 
     
     
