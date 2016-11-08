@@ -5,6 +5,7 @@ from scipy.stats import multivariate_normal
 
 color_arr = ["red", "green", "blue", "yellow", "grey"]
 
+
 def calc_mean(X, p_ik, k):
     '''
     X -> All data points shape -> (N ,2)
@@ -25,8 +26,8 @@ def calc_var(X, p_ik, mean_k, k):
     X_minus_mean = X - mean_k
     
     sum_var = np.zeros((2, 2))
-    for i in range(len(X_minus_mean)) :
-        sum_var += p_ik[i][k] * np.dot(np.transpose(X_minus_mean[i]), X_minus_mean[i])
+    for i in range(len(X_minus_mean)) :        
+        sum_var += p_ik[i][k] * np.dot(np.transpose([X_minus_mean[i]]), np.array([X_minus_mean[i]]))
     
     return sum_var / N_k
 
@@ -35,6 +36,7 @@ def run_em_gaussian(K, X, data_set_name):
     K -> num of clusters
     X -> all data points X[0] = [x_1, x_2]
     '''
+    count = 0
     # Initialize mean randomly
     means = []
     for random_x in np.random.choice(len(X), K):
@@ -64,6 +66,8 @@ def run_em_gaussian(K, X, data_set_name):
             sum_n_ik = np.sum(n_ik)
             p_ik.append([ n / sum_n_ik for n in n_ik])
         
+        print means,"\n", covar
+        
         dist_with_prev = []
         p_ik = np.array(p_ik)
         # find mean and covar of all clusters
@@ -79,20 +83,6 @@ def run_em_gaussian(K, X, data_set_name):
         
         print avg_dist_with_prev, means,"\n", covar
         
-        ##DELETE
-        # dict of cluster to list of points in that cluster
-        cluster = dict.fromkeys(range(K))
-        # initialize all clusters with 0 data points
-        for k in cluster:
-            cluster[k] = []
-        # assign k to X if p_ik is max for X  
-        for i in range(len(X)):
-            k = np.argmax(p_ik[i])
-            cluster[k].append(X[i])
-        
-        print data_set_name, "Cluster :", "\t".join([ "{0} - {1} points".format(cluster_id + 1, len(points)) for cluster_id, points in cluster.iteritems()])
-        plot_scatter([(points, color_arr[cluster_id]) for cluster_id, points in cluster.iteritems()], "./kmeans/" + data_set_name + str(K), means)
-        ##DELETE
     
     # dict of cluster to list of points in that cluster
     cluster = dict.fromkeys(range(K))
@@ -102,9 +92,9 @@ def run_em_gaussian(K, X, data_set_name):
     # assign k to X if p_ik is max for X  
     for i in range(len(X)):
         k = np.argmax(p_ik[i])
-        cluster[k] = X
+        cluster[k].append(X[i])
         
-        
+    
     print data_set_name, "Cluster :", "\t".join([ "{0} - {1} points".format(cluster_id + 1, len(points)) for cluster_id, points in cluster.iteritems()])
     plot_scatter([(points, color_arr[cluster_id]) for cluster_id, points in cluster.iteritems()], "./kmeans/" + data_set_name + str(K), means)
         
