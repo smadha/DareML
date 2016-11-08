@@ -6,11 +6,12 @@ import matplotlib.pyplot as plt
 
 color_arr = ["red", "green", "blue", "yellow", "grey"]
 
-def plot_line(x,y, name):
+def plot_line(x_y, name):
     '''
-    
+    plot list of line in a figure with diff colors 
     '''
-    plt.plot(x,y, markersize=5)
+    for idx,(x,y) in enumerate(x_y):
+        plt.plot(x,y, markersize=5, color=color_arr[idx])
         
     plt.figtext(.02, .02, name)
     plt.savefig(name)
@@ -99,7 +100,7 @@ def run_em_gaussian(K, X, data_set_name):
         log_like.append(sum( np.log([sum(x * prior) for x in n_ik]) ))
         
     
-    plot_line(range(len(log_like)), [l+100 for l in log_like] , "./kmeans/log_like_" + data_set_name)
+    
     
     # dict of cluster to list of points in that cluster
     cluster = dict.fromkeys(range(K))
@@ -115,10 +116,15 @@ def run_em_gaussian(K, X, data_set_name):
     print data_set_name, "Cluster :", "\t".join([ "{0} - {1} points".format(cluster_id + 1, len(points)) for cluster_id, points in cluster.iteritems()])
     plot_scatter([(points, color_arr[cluster_id]) for cluster_id, points in cluster.iteritems()], "./kmeans/" + data_set_name , means)
     
+    return (range(len(log_like)), [l+100 for l in log_like])
+    
     
 if __name__ == '__main__':
-    
+    print "Running EM"
+    x_y = []
     for i in range(5):
-        run_em_gaussian(3, blob_data, "blob_data_EM_{0}".format(i)) 
+        x_y.append(run_em_gaussian(3, blob_data, "blob_data_EM_{0}".format(i))) 
+        
+    plot_line( x_y , "./kmeans/log_like_blob_data_EM")
     
     
