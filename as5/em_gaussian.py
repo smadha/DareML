@@ -2,9 +2,19 @@
 import numpy as np
 from input_data_util import blob_data, plot_scatter
 from scipy.stats import multivariate_normal
+import matplotlib.pyplot as plt
 
 color_arr = ["red", "green", "blue", "yellow", "grey"]
 
+def plot_line(x,y, name):
+    '''
+    
+    '''
+    plt.plot(x,y, markersize=5)
+        
+    plt.figtext(.02, .02, name)
+    plt.savefig(name)
+    plt.close()
 
 def calc_mean(X, p_ik, k):
     '''
@@ -36,7 +46,7 @@ def run_em_gaussian(K, X, data_set_name):
     K -> num of clusters
     X -> all data points X[0] = [x_1, x_2]
     '''
-    count = 0
+    log_like = []
     # Initialize mean randomly
     means = []
     for random_x in np.random.choice(len(X), K):
@@ -51,25 +61,27 @@ def run_em_gaussian(K, X, data_set_name):
     avg_dist_with_prev = 10
             
     # Probability of X_i in cluster k. shape -> (N ,K)
-    p_ik = [] 
-    while avg_dist_with_prev > 0.01:
+    p_ik = []
+    prior = np.array( [ 1.0/K for k in range(K)] ) 
+    while avg_dist_with_prev > 0.001:
         # store current mean to be used later
         prev_means = [] + means
         
         p_ik = []
+        n_ik = []
         # calculate p_ik for each point
-        for x in X:
-            n_ik = []
+        for idx, x in enumerate(X):
+            n_ik.append([])
             for k in range(K):
-                n_ik.append(multivariate_normal.pdf(x, mean=means[k], cov=covar[k]))
+                n_ik[idx].append(multivariate_normal.pdf(x, mean=means[k], cov=covar[k]))
             
-            sum_n_ik = np.sum(n_ik)
-            p_ik.append([ n / sum_n_ik for n in n_ik])
-        
-        print means,"\n", covar
+            sum_n_ik = np.sum(n_ik[idx] * prior)
+            p_ik.append([ n / sum_n_ik for n in n_ik[idx] * prior ])
         
         dist_with_prev = []
+        
         p_ik = np.array(p_ik)
+        n_ik = np.array(n_ik)
         # find mean and covar of all clusters
         for k in range(K):
             means[k] = calc_mean(X, p_ik, k)
@@ -81,8 +93,13 @@ def run_em_gaussian(K, X, data_set_name):
         # average distance with prev
         avg_dist_with_prev = np.average(dist_with_prev)
         
-        print avg_dist_with_prev, means,"\n", covar
+        prior = np.array( [ sum(p_ik[:,k])/len(X) for k in range(K)] )
         
+        # calculate log likelihood of whole data
+        log_like.append(sum( np.log([sum(x * prior) for x in n_ik]) ))
+        
+    
+    plot_line(range(len(log_like)), [l+100 for l in log_like] , "./kmeans/log_like_" + data_set_name)
     
     # dict of cluster to list of points in that cluster
     cluster = dict.fromkeys(range(K))
@@ -94,13 +111,14 @@ def run_em_gaussian(K, X, data_set_name):
         k = np.argmax(p_ik[i])
         cluster[k].append(X[i])
         
-    
+    print means, covar
     print data_set_name, "Cluster :", "\t".join([ "{0} - {1} points".format(cluster_id + 1, len(points)) for cluster_id, points in cluster.iteritems()])
-    plot_scatter([(points, color_arr[cluster_id]) for cluster_id, points in cluster.iteritems()], "./kmeans/" + data_set_name + str(K), means)
-        
+    plot_scatter([(points, color_arr[cluster_id]) for cluster_id, points in cluster.iteritems()], "./kmeans/" + data_set_name , means)
+    
     
 if __name__ == '__main__':
     
-    run_em_gaussian(3, blob_data, "blob_data_EM") 
+    for i in range(5):
+        run_em_gaussian(3, blob_data, "blob_data_EM_{0}".format(i)) 
     
     

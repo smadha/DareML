@@ -60,7 +60,7 @@ def run_k_means(K, X, data_set_name, trans = linear):
         
         # average distance with prev
         avg_dist_with_prev = np.average(dist_with_prev)
-        
+    
     print data_set_name, "Cluster :", "\t".join([ "{0} - {1} points".format(cluster_id+1, len(points)) for cluster_id, points in cluster.iteritems()])
     plot_scatter( [(points, color_arr[cluster_id]) for cluster_id, points in cluster.iteritems()], "./kmeans/" + data_set_name + str(K), means )
         
@@ -69,9 +69,9 @@ if __name__ == '__main__':
     
     print "Running K-Means"
     for k in [2, 3, 5]:
-        run_k_means(k, blob_data, "blob_data")
-        run_k_means(k, circle_data, "circle_data") 
+        run_k_means(k, blob_data, "blob_data_")
+        run_k_means(k, circle_data, "circle_data_") 
     
     print "Running K-Means with kernel"
-    run_k_means(2, circle_data, "circle_data_kernel",poly)
+    run_k_means(2, circle_data, "circle_data_kernel_",poly)
     
