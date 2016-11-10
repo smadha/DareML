@@ -117,14 +117,16 @@ def run_em_gaussian(K, X, data_set_name):
     plot_scatter([(points, color_arr[cluster_id]) for cluster_id, points in cluster.iteritems()], "./kmeans/" + data_set_name , means)
     
     return (range(len(log_like)), [l+100 for l in log_like])
-    
-    
-if __name__ == '__main__':
+
+def main_fn():
     print "Running EM"
     x_y = []
     for i in range(5):
         x_y.append(run_em_gaussian(3, blob_data, "blob_data_EM_{0}".format(i))) 
         
     plot_line( x_y , "./kmeans/log_like_blob_data_EM")
+    
+if __name__ == '__main__':
+    main_fn()
     
     
